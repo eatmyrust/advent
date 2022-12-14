@@ -74,9 +74,13 @@ def day_five():
     ]
     step_tracker = [[int(step_nums) for i, step_nums in enumerate(step.split()) if i%2 != 0] for step in steps.split("\n")]
     for step in step_tracker:
-        for _ in range(step[0]):
-            stack_tracker[step[2]-1] = stack_tracker[step[1]-1][:1] + stack_tracker[step[2]-1]
-            stack_tracker[step[1]-1] = stack_tracker[step[1]-1][1:]
+        # PART 1
+        # for _ in range(step[0]):
+        #     stack_tracker[step[2]-1] = stack_tracker[step[1]-1][:1] + stack_tracker[step[2]-1]
+        #     stack_tracker[step[1]-1] = stack_tracker[step[1]-1][1:]
+        # PART 2
+        stack_tracker[step[2]-1] = stack_tracker[step[1]-1][:step[0]] + stack_tracker[step[2]-1]
+        stack_tracker[step[1]-1] = stack_tracker[step[1]-1][step[0]:]
     answer = ""
     for stack in stack_tracker:
         answer += stack[0]
