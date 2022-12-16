@@ -168,6 +168,77 @@ def day_seven():
     print(answer_holder[0])
 
 
+def traverse_rows(row_split, start_element, matrix, visible_trees):
+    for i, row in enumerate(matrix[1:-1]):
+        tallest_tree = row[start_element]
+        for j, row_element in enumerate(row[row_split[0]:row_split[1]:row_split[2]]):
+            if row_element > tallest_tree:
+                if start_element == 0:
+                    column_index = j
+                else:
+                    column_index = len(row[row_split[0]:row_split[1]:row_split[2]]) - 1 - j
+                tallest_tree = row_element
+                visible_trees[i][column_index] = 1
+
+def traverse_columns(column_split, start_element, matrix, visible_trees):
+    for i, column_start in enumerate(matrix[start_element][1:-1]):
+        tallest_tree = column_start
+        for j, row in enumerate(matrix[column_split[0]:column_split[1]:column_split[2]]):
+            if row[1:-1][i] > tallest_tree:
+                if start_element == 0:
+                    row_index = j
+                else:
+                    row_index = len(matrix[column_split[0]:column_split[1]:column_split[2]]) - 1 - j
+                tallest_tree = row[1:-1][i]
+                visible_trees[row_index][i] = 1
+
+def calculate_scenic_ranking(matrix, scenic_ranking):
+    for i, row in enumerate(matrix[1:-1]):
+        visible_trees = 0
+        for j, row_element in enumerate(row[1:-1]):
+            for element in row[j::-1]:
+                visible_trees+=1
+                if element >= row_element:
+                    break
+            scenic_ranking[i][j]*=visible_trees
+            visible_trees = 0
+            for element in row[j+2::]:
+                visible_trees += 1
+                if element >= row_element:
+                    break
+            scenic_ranking[i][j]*=visible_trees
+            visible_trees = 0
+            for element in matrix[i::-1]:
+                visible_trees += 1
+                if element[j+1] >= row_element:
+                    break
+            scenic_ranking[i][j]*=visible_trees
+            visible_trees = 0
+            for element in matrix[i+2::]:
+                visible_trees += 1
+                if element[j+1] >= row_element:
+                    break
+            scenic_ranking[i][j]*=visible_trees
+            visible_trees = 0
+
+
+def day_eight():
+    print("----------------DAY EIGHT----------------")
+    grid = open("advent/inputs/day_8.txt").read().split("\n")
+    matrix = [[int(row_item) for row_item in row] for row in grid]
+    visible_trees = [[0 for _ in row[1:-1]] for row in grid[1:-1]]
+    print(len(visible_trees[0]), len(visible_trees))
+    permitter = len(matrix[0]) + len(matrix[-1]) + (len(matrix)-2)*2
+    traverse_rows((1, -1, 1), 0, matrix, visible_trees)
+    traverse_rows((-2, 0, -1), -1, matrix, visible_trees)
+    traverse_columns((1, -1, 1), 0, matrix, visible_trees)
+    traverse_columns((-2, 0, -1), -1, matrix, visible_trees)
+    print(f"Part One: {sum([sum(row) for row in visible_trees])+permitter}")
+    scenic_ranking = [[1 for _ in row[1:-1]] for row in grid[1:-1]]
+    calculate_scenic_ranking(matrix, scenic_ranking)
+    print(f"Part Two: {max([max(row) for row in scenic_ranking])}")
+
+
 def main():
     day_one()
     day_two()
@@ -183,3 +254,4 @@ def main():
     day_six(14)
 
     day_seven()
+    day_eight()
