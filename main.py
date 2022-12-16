@@ -114,8 +114,33 @@ def nested_set(dic: dict, keys, value):
         dic = dic.setdefault(key, {})
     dic[keys[-1]] = value
 
+def dir_size_adder(dic: dict, answers: list, part_two: bool):
+    current_count = 0
+    for value in dic.values():
+        if isinstance(value, dict):
+            nested_dir_size = dir_size_adder(value, answers, part_two)
+            current_count += nested_dir_size if not part_two else 0
+        else:
+            current_count += value
+    if part_two or current_count <= 100000:
+        answers.append(current_count)
+    return current_count
+
+def find_dir_to_delete(dic: dict, answer: list, free_up_space: int):
+    current_count = 0
+    for value in dic.values():
+        if isinstance(value, dict):
+            current_count += find_dir_to_delete(value, answer, free_up_space)
+        else:
+            current_count += value
+    if current_count > free_up_space and answer[0] - free_up_space > current_count - free_up_space:
+        answer.pop()
+        answer.append(current_count)
+    return current_count
+
 def day_seven():
-    lines = open("advent/inputs/day_7_test.txt").read().split("\n")
+    print("----------------DAY SEVEN----------------")
+    lines = open("advent/inputs/day_7.txt").read().split("\n")
     current_path = []
     directory_structure = {}
     for line in lines:
@@ -131,6 +156,16 @@ def day_seven():
         elif split_line[0] != "dir" and line[0] != "$":
             current_file = current_path + [split_line[1]]
             nested_set(directory_structure, current_file, int(split_line[0]))
+    answers = []
+    dir_size_adder(directory_structure, answers, False)
+    print(f"Part One: {sum(answers)}")
+
+    total_size = []
+    dir_size_adder(directory_structure, total_size, True)
+    free_up_size = 30000000 - (70000000 - sum(total_size))
+    answer_holder = [70000000]
+    find_dir_to_delete(directory_structure, answer_holder, free_up_size)
+    print(answer_holder[0])
 
 
 def main():
@@ -146,3 +181,5 @@ def main():
     print("----------------DAY SIX----------------")
     day_six(4)
     day_six(14)
+
+    day_seven()
