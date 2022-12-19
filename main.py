@@ -296,12 +296,12 @@ def day_nine(part_one):
             else:
                 head_position = (head_position[0] - 1, head_position[1])
             if part_one:
+                tail_position = calculate_next_pos(head_position, tail_position)
+            else:
                 middle_positions[0] = calculate_next_pos(head_position, middle_positions[0])
                 for i, position in enumerate(middle_positions[1::]):
                     middle_positions[i+1] = calculate_next_pos(middle_positions[i], position)
                 tail_position = calculate_next_pos(middle_positions[-1], tail_position)
-            else:
-                tail_position = calculate_next_pos(head_position, tail_position)
             tail_has_been.add(tail_position)
     print(f"{'Part One:' if part_one else 'Part Two:'} {len(tail_has_been)}")
 
