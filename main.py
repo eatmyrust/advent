@@ -239,6 +239,73 @@ def day_eight():
     print(f"Part Two: {max([max(row) for row in scenic_ranking])}")
 
 
+def calculate_next_pos(head_position, tail_position):
+    x_distance = head_position[0] - tail_position[0]
+    y_distance = head_position[1] - tail_position[1]
+    if abs(x_distance) == 1 and abs(y_distance) == 1:
+        return tail_position
+    if abs(x_distance) > 1 and abs(y_distance) > 1:
+        if x_distance < 0:
+            new_tail_x = tail_position[0] - 1
+        else:
+            new_tail_x = tail_position[0] + 1
+        if y_distance < 0:
+            new_tail_y = tail_position[1] - 1
+        else:
+            new_tail_y = tail_position[1] + 1
+        return (new_tail_x, new_tail_y)
+    if abs(x_distance) > 1:
+        if x_distance < 0:
+            new_tail_x = tail_position[0] - 1
+        else:
+            new_tail_x = tail_position[0] + 1
+        if abs(y_distance) > 0:
+            new_tail_y = tail_position[1] + y_distance
+        else:
+            new_tail_y = tail_position[1]
+        tail_position = (new_tail_x, new_tail_y)
+        return tail_position
+    if abs(y_distance) > 1:
+        if y_distance < 0:
+            new_tail_y = tail_position[1] - 1
+        else:
+            new_tail_y = tail_position[1] + 1
+        if abs(x_distance) > 0:
+            new_tail_x = tail_position[0] + x_distance
+        else:
+            new_tail_x = tail_position[0]
+        tail_position = (new_tail_x, new_tail_y)
+        return tail_position
+    return tail_position
+
+def day_nine(part_one):
+    moves = open("advent/inputs/day_9.txt").read().split("\n")
+    head_position = (0, 0)
+    middle_positions = [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
+    tail_position = (0, 0)
+    tail_has_been = {(0,0)}
+    for move in moves:
+        direction, steps = tuple(move.split())
+        for _ in range(int(steps)):
+            if direction == "D":
+                head_position = (head_position[0], head_position[1] - 1)
+            elif direction == "U":
+                head_position = (head_position[0], head_position[1] + 1)
+            elif direction == "R":
+                head_position = (head_position[0] + 1, head_position[1])
+            else:
+                head_position = (head_position[0] - 1, head_position[1])
+            if part_one:
+                middle_positions[0] = calculate_next_pos(head_position, middle_positions[0])
+                for i, position in enumerate(middle_positions[1::]):
+                    middle_positions[i+1] = calculate_next_pos(middle_positions[i], position)
+                tail_position = calculate_next_pos(middle_positions[-1], tail_position)
+            else:
+                tail_position = calculate_next_pos(head_position, tail_position)
+            tail_has_been.add(tail_position)
+    print(f"{'Part One:' if part_one else 'Part Two:'} {len(tail_has_been)}")
+
+
 def main():
     day_one()
     day_two()
@@ -255,3 +322,7 @@ def main():
 
     day_seven()
     day_eight()
+
+    print("----------------DAY NINE----------------")
+    day_nine(True)
+    day_nine(False)
