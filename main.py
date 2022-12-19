@@ -306,6 +306,39 @@ def day_nine(part_one):
     print(f"{'Part One:' if part_one else 'Part Two:'} {len(tail_has_been)}")
 
 
+def day_ten():
+    instructions = open("advent/inputs/day_10.txt").read().split("\n")
+    # check_cycle = [20, 60, 100, 140, 180, 220]
+    # total_strength = 0
+    current_cycle = 0
+    x = 1
+    screen = ""
+    for instruction in instructions:
+        if abs(current_cycle-x) <= 1:
+            screen = screen + "#"
+        else:
+            screen = screen + "."
+        current_cycle += 1
+        if current_cycle%40 == 0:
+            # total_strength += current_cycle*x
+            screen = screen + "\n"
+            current_cycle = 0
+        if len(instruction.split()) == 1:
+            continue
+        else:
+            if abs(current_cycle-x) <= 1:
+                screen = screen + "#"
+            else:
+                screen = screen + "."
+            current_cycle += 1
+            if current_cycle%40 == 0:
+                # total_strength += current_cycle*x
+                screen = screen + "\n"
+                current_cycle = 0
+            x += int(instruction.split()[1])
+    print(screen)
+
+
 def main():
     day_one()
     day_two()
