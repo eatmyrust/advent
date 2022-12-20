@@ -339,6 +339,59 @@ def day_ten():
     print(screen)
 
 
+class Monkey:
+    def __init__(self, items, operation, test, true_monkey, false_monkey):
+        self.items = items
+        self.operation = operation
+        self.test = test
+        self.true_monkey = true_monkey
+        self.false_monkey = false_monkey
+        self.inspection_count = 0
+
+    # def __repr__(self):
+    #     return f"Monkey: {self.items}, {self.operation}, {self.test}, {self.true_monkey}, {self.false_monkey}, {self.inspection_count}"
+
+def day_eleven():
+    monkeys = open("advent/inputs/day_11.txt").read().split("\n\n")
+    parsed_monkeys = [
+        Monkey(
+            [int(item) for item in monkey.split("\n")[1][17::].split(",")],
+            monkey.split("\n")[2][18::],
+            int(monkey.split("\n")[3][20::]),
+            int(monkey.split("\n")[4][28::]),
+            int(monkey.split("\n")[5][29::]),
+        )
+        for monkey
+        in monkeys
+    ]
+    mod_val = 1
+    for monke in parsed_monkeys:
+        mod_val *= monke.test
+    for _ in range(10000):
+        for monke in parsed_monkeys:
+            for item in monke.items:
+                monke.inspection_count += 1
+                operation = monke.operation.split()
+                if operation[2] == "old":
+                    operand = item
+                else:
+                    operand = int(operation[2])
+                if operation[1] == "*":
+                    new_item = (item*operand)%mod_val
+                else:
+                    new_item = (item+operand)%mod_val
+                if new_item % monke.test == 0:
+                    parsed_monkeys[monke.true_monkey].items.append(new_item)
+                else:
+                    parsed_monkeys[monke.false_monkey].items.append(new_item)
+            monke.items = []
+
+    total_operations = [monkey.inspection_count for monkey in parsed_monkeys]
+    total_operations.sort()
+    print(total_operations[-1]*total_operations[-2])
+
+
+
 def main():
     day_one()
     day_two()
