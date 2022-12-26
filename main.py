@@ -391,6 +391,69 @@ def day_eleven():
     print(total_operations[-1]*total_operations[-2])
 
 
+def handle_vertex(mountains, graph: dict[tuple, list], current: tuple, neighbor: tuple):
+    current_exists = graph.get(current)
+    current_value = mountains[current[0]][current[1]] if mountains[current[0]][current[1]] != "S" else "a"
+    neighbor_value = mountains[neighbor[0]][neighbor[1]] if mountains[neighbor[0]][neighbor[1]] != "E" else "z"
+    if ord(current_value) - ord(neighbor_value) >= -1:
+        if current_exists:
+            graph[current].append(neighbor)
+        else:
+            graph[current] = [neighbor]
+
+def build_graph(mountains, graph: dict[tuple, list]):
+    start = []
+    for i, row in enumerate(mountains):
+        for j, height in enumerate(row):
+            if height == "S" or height == "a":
+                start.append((i, j))
+            elif height == "E":
+                end = (i, j)
+                continue
+            if i > 0:
+                handle_vertex(mountains, graph, (i, j), (i - 1, j))
+            if i < len(mountains) - 1:
+                handle_vertex(mountains, graph, (i, j), (i + 1, j))
+            if j > 0:
+                handle_vertex(mountains, graph, (i, j), (i, j - 1))
+            if j < len(row) - 1:
+                handle_vertex(mountains, graph, (i, j), (i, j + 1))
+    return start, end
+
+def BFS_SP(graph, start, goal):
+	explored = []
+
+	queue = [[start]]
+
+	while queue:
+		path = queue.pop(0)
+		node = path[-1]
+
+		if node not in explored:
+			neighbours = graph[node]
+
+			for neighbour in neighbours:
+				new_path = list(path)
+				new_path.append(neighbour)
+				queue.append(new_path)
+
+				if neighbour == goal:
+					return len(new_path)
+			explored.append(node)
+
+def day_twelve():
+    mountain_rows = open("advent/inputs/day_12.txt").read().split("\n")
+    mountains = [[*row] for row in mountain_rows]
+
+    graph = {}
+    start, end = build_graph(mountains, graph)
+    distances = []
+    for i, position in enumerate(start):
+        print(f"{i}/{len(start)}")
+        distance = BFS_SP(graph, position, end)
+        if distance:
+            distances.append(distance)
+    print(min(distances))
 
 def main():
     day_one()
